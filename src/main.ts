@@ -65,7 +65,7 @@ async function run(): Promise<void> {
   }
 
   const remote = `https://${actor}:${githubToken}@github.com/${repoOwner}/${repoName}.git`
-  await kit.execAndCapture('git', ['push', remote, releaseBranch])
+  await kit.execAndCapture('git', ['push', remote, `:${releaseBranch}`])
 }
 
 run().catch(err => {
