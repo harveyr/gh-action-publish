@@ -63,14 +63,15 @@ async function run(): Promise<void> {
     ])
   }
 
-  const releaseBranch = util.swapPrefix(ref)
-
   if (!githubToken) {
     console.log('No Github token provided. Not pushing.')
   }
 
   const remote = `https://${actor}:${githubToken}@github.com/${repoOwner}/${repoName}.git`
-  const pushArgs = ['push', remote, `HEAD:${releaseBranch}`]
+  const version = ref.split('/').pop()
+  // const releaseBranch = util.swapPrefix(ref)
+  // const pushArgs = ['push', remote, `HEAD:${releaseBranch}`]
+  const pushArgs = ['push', remote, `releases/${version}`]
   if (forcePush) {
     pushArgs.push('--force')
   }
