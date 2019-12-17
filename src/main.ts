@@ -13,9 +13,34 @@ async function areChanges(): Promise<boolean> {
   return (changedOutput.stderr + changedOutput.stdout).length > 0
 }
 
+async function configureGit(): Promise<void> {
+  await kit.execAndCapture('git', [
+    'config',
+    '--local',
+    'user.email',
+    'action@github.com',
+  ])
+  await kit.execAndCapture('git', [
+    'config',
+    '--local',
+    'user.name',
+    'Github Action',
+  ])
+}
+
 async function run(): Promise<void> {
   const githubToken = core.getInput('github_token')
   const forcePush = core.getInput('force') === 'true'
+  const addPaths: string[] = core
+    .getInput('commit_dirs')
+    .split(' ')
+    .map(token => {
+      return token.trim()
+    })
+    .filter(token => {
+      return Boolean(token)
+    })
+
   const context = github.context
   if (!context.payload.repository) {
     throw new Error('No repository found in Github payload. Cannot continue.')
@@ -30,39 +55,38 @@ async function run(): Promise<void> {
     throw new Error(`Ref is not an expected pattern: "${ref}"`)
   }
 
-  const commitPrefix = `Auto commit on behalf of ${actor}`
-  await kit.execAndCapture('git', [
-    'config',
-    '--local',
-    'user.email',
-    'action@github.com',
-  ])
-  await kit.execAndCapture('git', [
-    'config',
-    '--local',
-    'user.name',
-    'Github Action',
-  ])
+  await configureGit()
 
-  // Build and commit the source files.
-  await kit.execAndCapture('npm', ['ci'])
-  await kit.execAndCapture('npm', ['run', 'build'])
-  await kit.execAndCapture('git', ['add', '-f', 'lib'])
-  if (await areChanges()) {
-    await kit.execAndCapture('git', ['commit', '-m', `${commitPrefix}: build`])
+  for (const dirPath of addPaths) {
+    await kit.execAndCapture('git', ['add', '-f', dirPath])
   }
-
-  // Install and commit the dist node_modules.
-  await kit.execAndCapture('npm', ['cache', 'verify'])
-  await kit.execAndCapture('npm', ['ci', '--only=production'])
-  await kit.execAndCapture('git', ['add', '-f', 'node_modules'])
   if (await areChanges()) {
     await kit.execAndCapture('git', [
       'commit',
       '-m',
-      `${commitPrefix}: node_modules`,
+      `Auto commit on behalf of ${actor}`,
     ])
   }
+
+  // Build and commit the source files.
+  // await kit.execAndCapture('npm', ['ci'])
+  // await kit.execAndCapture('npm', ['run', 'build'])
+  // await kit.execAndCapture('git', ['add', '-f', 'lib'])
+  // if (await areChanges()) {
+  //   await kit.execAndCapture('git', ['commit', '-m', `${commitPrefix}: build`])
+  // }
+
+  // Install and commit the dist node_modules.
+  // await kit.execAndCapture('npm', ['cache', 'verify'])
+  // await kit.execAndCapture('npm', ['ci', '--only=production'])
+  // await kit.execAndCapture('git', ['add', '-f', 'node_modules'])
+  // if (await areChanges()) {
+  //   await kit.execAndCapture('git', [
+  //     'commit',
+  //     '-m',
+  //     `${commitPrefix}: node_modules`,
+  //   ])
+  // }
 
   if (!githubToken) {
     console.log('No Github token provided. Not pushing.')

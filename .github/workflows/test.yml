@@ -24,9 +24,14 @@ jobs:
 
       - run: npm test
 
+      - run: |
+          npm i @zeit/ncc
+          ncc build lib/main.js -o dist
+
       - uses: ./
         with:
           # TODO: make dashes vs. underscores consistent
           github_token: ${{ secrets.GITHUB_TOKEN }}
           force: true
+          commit_dirs: dist
         if: contains(github.ref, 'refs/heads/versions/' )

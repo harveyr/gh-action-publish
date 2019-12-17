@@ -2,11 +2,13 @@ name: 'Your name here'
 description: 'Provide a description here'
 author: 'Your name or organization here'
 inputs:
-  force:
-    description: Force push
-    default: false
+  commit_dirs:
+    description: Space-separated directory paths to force-add and commit
   github_token:
     description: Github token (required for pushing)
-runs:
+  force:
+    description: Force push (probably required after the first push)
+    default: false
+  runs:
   using: node12
   main: lib/main.js
