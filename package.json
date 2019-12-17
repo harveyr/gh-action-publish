@@ -1,8 +1,8 @@
 {
-  "name": "replace-me",
+  "name": "gh-action-publish",
   "version": "0.0.0",
   "private": true,
-  "description": "FIXME: REPLACE ME",
+  "description": "Github Action to auto publish Github Action assets",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
@@ -10,12 +10,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fixme:replace"
+    "url": "git+https://github.com/harveyr/gh-action-publish.git"
   },
-  "author": "FIXME:",
+  "author": "Harvey Rogers",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.2.0"
+    "@actions/core": "^1.2.0",
+    "@harveyr/github-actions-kit": "0.0.3"
   },
   "devDependencies": {
     "@types/jest": "^24.0.22",
