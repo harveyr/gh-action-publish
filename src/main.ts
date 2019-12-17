@@ -71,7 +71,7 @@ async function run(): Promise<void> {
   // const releaseBranch = util.swapPrefix(ref)
   // const pushArgs = ['push', remote, `HEAD:${releaseBranch}`]
   const version = ref.split('/').pop()
-  const pushArgs = ['push', remote, `HEAD:releases/${version}`]
+  const pushArgs = ['push', remote, `HEAD:refs/heads/releases/${version}`]
   // await kit.execAndCapture('git', ['remote', 'add', 'github', remote])
   // const pushArgs = ['push', '--set-upstream', 'github', `releases/${version}`]
   if (forcePush) {
