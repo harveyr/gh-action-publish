@@ -1,9 +1,17 @@
 import * as core from '@actions/core'
-import * as kit from '@harveyr/github-actions-kit'
 import * as github from '@actions/github'
+import * as kit from '@harveyr/github-actions-kit'
 import * as util from './util'
 
-import { IN_PREFIX } from './constants'
+/**
+ * Returns true if git sees changes in the workspace.
+ *
+ * There's probably a more elegant way to do this.
+ */
+async function areChanges(): Promise<boolean> {
+  const changedOutput = await kit.execAndCapture('git', ['status', '-s'])
+  return (changedOutput.stderr + changedOutput.stdout).length > 0
+}
 
 async function run(): Promise<void> {
   const githubToken = core.getInput('github_token')
@@ -17,12 +25,11 @@ async function run(): Promise<void> {
   console.log('Parsed repo: %s/%s', repoName, repoOwner)
 
   const { ref, actor } = context
-  if (ref.indexOf(IN_PREFIX) !== 0) {
-    throw new Error(`Ref must begin with "${IN_PREFIX}". Got "${ref}".`)
+  if (!util.isVersionRef(ref)) {
+    throw new Error(`Ref is not an expected pattern: "${ref}"`)
   }
 
   const commitPrefix = `Auto commit on behalf of ${actor}`
-  // await kit.execAndCapture('git', ['checkout', '-b', releaseBranch])
   await kit.execAndCapture('git', [
     'config',
     '--local',
@@ -35,18 +42,19 @@ async function run(): Promise<void> {
     'user.name',
     'Github Action',
   ])
+
+  // Build and commit the source files.
   await kit.execAndCapture('npm', ['ci'])
   await kit.execAndCapture('npm', ['run', 'build'])
   await kit.execAndCapture('git', ['add', '-f', 'lib'])
-  let changedOutput = await kit.execAndCapture('git', ['status', '-s'])
-  if ((changedOutput.stderr + changedOutput.stdout).length) {
+  if (await areChanges()) {
     await kit.execAndCapture('git', ['commit', '-m', `${commitPrefix}: build`])
   }
 
+  // Install and commit the dist node_modules.
   await kit.execAndCapture('npm', ['ci', '--only=production'])
   await kit.execAndCapture('git', ['add', '-f', 'node_modules'])
-  changedOutput = await kit.execAndCapture('git', ['status', '-s'])
-  if ((changedOutput.stderr + changedOutput.stdout).length) {
+  if (await areChanges()) {
     await kit.execAndCapture('git', [
       'commit',
       '-m',
