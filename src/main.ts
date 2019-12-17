@@ -68,26 +68,6 @@ async function run(): Promise<void> {
     ])
   }
 
-  // Build and commit the source files.
-  // await kit.execAndCapture('npm', ['ci'])
-  // await kit.execAndCapture('npm', ['run', 'build'])
-  // await kit.execAndCapture('git', ['add', '-f', 'lib'])
-  // if (await areChanges()) {
-  //   await kit.execAndCapture('git', ['commit', '-m', `${commitPrefix}: build`])
-  // }
-
-  // Install and commit the dist node_modules.
-  // await kit.execAndCapture('npm', ['cache', 'verify'])
-  // await kit.execAndCapture('npm', ['ci', '--only=production'])
-  // await kit.execAndCapture('git', ['add', '-f', 'node_modules'])
-  // if (await areChanges()) {
-  //   await kit.execAndCapture('git', [
-  //     'commit',
-  //     '-m',
-  //     `${commitPrefix}: node_modules`,
-  //   ])
-  // }
-
   if (!githubToken) {
     console.log('No Github token provided. Not pushing.')
   }
