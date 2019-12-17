@@ -80,7 +80,7 @@ async function run(): Promise<void> {
   await kit.execAndCapture('git', ['fetch'])
 
   try {
-    await kit.execAndCapture('git', ['checkout', `origin/${releaseBranch}`])
+    await kit.execAndCapture('git', ['checkout', releaseBranch])
     await kit.execAndCapture('git', ['merge', currentBranch])
     await kit.execAndCapture('git', ['push', 'origin', 'HEAD'])
   } catch (err) {
