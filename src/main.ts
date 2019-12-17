@@ -30,7 +30,7 @@ async function configureGit(): Promise<void> {
 
 async function run(): Promise<void> {
   const githubToken = core.getInput('github_token')
-  const forcePush = core.getInput('force') === 'true'
+  // const forcePush = core.getInput('force') === 'true'
   const addPaths: string[] = core
     .getInput('dirs')
     .split(' ')
@@ -74,11 +74,24 @@ async function run(): Promise<void> {
 
   // const remote = `https://${actor}:${githubToken}@github.com/${repoOwner}/${repoName}.git`
   const version = ref.split('/').pop()
-  const pushArgs = ['push', 'origin', `HEAD:refs/heads/releases/${version}`]
-  if (forcePush) {
-    pushArgs.push('--force')
+  const releaseBranch = `releases/${version}`
+  const currentBranch = ref.replace('refs/heads/', '')
+
+  try {
+    await kit.execAndCapture('git', ['checkout', `origin/${releaseBranch}`])
+    await kit.execAndCapture('git', ['merge', currentBranch])
+    await kit.execAndCapture('git', ['push', 'origin', 'HEAD'])
+  } catch (err) {
+    console.log('Failed to check out remote branch. Creating new one.')
+    await kit.execAndCapture('git', ['checkout', '-b', releaseBranch])
+    await kit.execAndCapture('git', ['push', '-u', 'origin', releaseBranch])
   }
-  await kit.execAndCapture('git', pushArgs)
+
+  // const pushArgs = ['push', 'origin', `HEAD:refs/heads/releases/${version}`]
+  // if (forcePush) {
+  //   pushArgs.push('--force')
+  // }
+  // await kit.execAndCapture('git', pushArgs)
 }
 
 run().catch(err => {
