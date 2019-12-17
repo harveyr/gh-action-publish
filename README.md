@@ -1,23 +1,20 @@
-A modified version of https://github.com/actions/typescript-action
+# gh-action-publish
 
-# Releases
+This is a Github Action to publish your Github Action!
 
-Tentative SOP, to be improved whenever possible:
+For the time being, it's experimental and infexible in assuming a particular
+workflow. This is somewhat purposeful in that I don't want to encourage adoption
+of it while my Github Action wisdom is puny and evolving.
 
-1. Commit all your code changes.
+Specifically, this:
 
-2. Check out a release branch. Keeping releases in these branches limits the
-   amount of node_modules thrash in the repo.
-```bash
-git checkout -b releases/v<NUM>
-# e.g.:
-git checkout -b releases/v3
-```
+- runs `npm build`, force-adds your `lib/` dir to git, and commits
+- installs your `node_modules` and force-adds/commits them as well
 
-3. Run the following script to commit your compiled JavaScripts and production
-   node_modules:
-```bash
-./scripts/push_release.sh
-```
+This is meant to solve the following problems:
 
-4. Maybe: Use Github UI to create a release and tag.
+- You have your `lib/` and `node_modules/` dirs ignored by git, but you need to
+  commit them for releases of Github Actions (currently required).
+- You suspect (as I do) that committing these things locally may be breaking
+  something when GitHub goes to run your action. (Maybe due to local disk
+  encryption. Not sure.)
