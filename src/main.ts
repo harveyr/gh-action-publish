@@ -71,7 +71,7 @@ async function run(): Promise<void> {
   const version = ref.split('/').pop()
   // const releaseBranch = util.swapPrefix(ref)
   // const pushArgs = ['push', remote, `HEAD:${releaseBranch}`]
-  const pushArgs = ['push', remote, `releases/${version}`]
+  const pushArgs = ['push', '--set-upstream', remote, `releases/${version}`]
   if (forcePush) {
     pushArgs.push('--force')
   }
