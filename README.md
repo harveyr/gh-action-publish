@@ -6,7 +6,7 @@ For the time being, it's experimental and infexible in assuming a particular
 workflow. This is somewhat purposeful in that I don't want to encourage adoption
 of it while my Github Action wisdom is puny and evolving.
 
-Specifically, this:
+Specifically, this Action:
 
 - runs `npm build`, force-adds your `lib/` dir to git, and commits
 - installs your `node_modules` and force-adds/commits them as well

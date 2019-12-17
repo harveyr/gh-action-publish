@@ -1,7 +1,5 @@
 import * as util from '../src/util'
 
-test('swap prefix', async () => {
-  expect(util.swapPrefix('refs/heads/versions/v0')).toBe(
-    'refs/heads/releases/v0',
-  )
+test('isVersionRef', async () => {
+  expect(util.isVersionRef('refs/heads/versions/v0')).toBe(true)
 })
