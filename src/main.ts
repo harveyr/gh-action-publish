@@ -4,9 +4,14 @@ import * as kit from '@harveyr/github-actions-kit'
 const BRANCH_PREFIX = 'refs/heads/versions/'
 
 async function run(): Promise<void> {
-  console.log('FIXME:', JSON.parse(core.getInput('github_context')))
+  const contextRaw = core.getInput('github_context')
+  if (contextRaw) {
+    throw new Error('github_context not provided')
+  }
+  const context = JSON.parse(contextRaw)
+  console.log('FIXME:', context.ref)
 
-  const githubUsername = core.getInput('github_username')
+  const githubUsername = core.getInput('github_usernamez')
   const githubToken = core.getInput('github_token')
 
   const branch = core.getInput('branch')
@@ -16,7 +21,7 @@ async function run(): Promise<void> {
     )
   }
 
-  const releaseBranch = branch.replace(BRANCH_PREFIX, 'releases/')
+  // const releaseBranch = branch.replace(BRANCH_PREFIX, 'releases/')
 
   // await kit.execAndCapture('git', ['checkout', '-b', releaseBranch])
   await kit.execAndCapture('git', [
@@ -57,9 +62,8 @@ async function run(): Promise<void> {
     console.log('No Github token provided. Not pushing.')
   }
 
-  const remote = `https://${githubUsername}:${githubToken}@github.com/${REPOSITORY}.git`
-
-  await kit.execAndCapture('git', ['push', remote, `HEAD:${releaseBranch}`])
+  // const remote = `https://${githubUsername}:${githubToken}@github.com/${REPOSITORY}.git`
+  // await kit.execAndCapture('git', ['push', remote, `HEAD:${releaseBranch}`])
 }
 
 run().catch(err => {
