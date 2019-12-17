@@ -12,7 +12,11 @@ async function run(): Promise<void> {
   const context = JSON.parse(contextRaw)
   console.log('FIXME:', context.ref)
 
-  const githubUsername = core.getInput('github_usernamez')
+  const longRepo: string = context.repository
+  const [username, repo] = longRepo.split('/')
+  console.log('Parsed repo: %s/%s', username, repo)
+
+  const githubUsername = core.getInput('github_username')
   const githubToken = core.getInput('github_token')
 
   const branch = core.getInput('branch')
