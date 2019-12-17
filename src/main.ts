@@ -35,13 +35,15 @@ async function run(): Promise<void> {
   }
 
   await kit.execAndCapture('npm', ['ci', '--only=production'])
-  await kit.execAndCapture('npm', ['run', 'build'])
-  await kit.execAndCapture('git', ['add', '-f', 'lib'])
-  let changedOutput = await kit.execAndCapture('git', ['status', '-s'])
+  await kit.execAndCapture('git', ['add', '-f', 'node_modules'])
+  changedOutput = await kit.execAndCapture('git', ['status', '-s'])
   if ((changedOutput.stderr + changedOutput.stdout).length) {
-    await kit.execAndCapture('git', ['commit', '-m', 'Auto commit: build'])
+    await kit.execAndCapture('git', [
+      'commit',
+      '-m',
+      'Auto commit: node_modules',
+    ])
   }
-  // git diff-index --quiet HEAD --
 }
 
 run().catch(err => {
