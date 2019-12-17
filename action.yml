@@ -2,6 +2,9 @@ name: 'Your name here'
 description: 'Provide a description here'
 author: 'Your name or organization here'
 inputs:
+  force:
+    description: Force push
+    default: false
   github_token:
     description: Github token (required for pushing)
 runs:

@@ -28,4 +28,5 @@ jobs:
         with:
           # TODO: make dashes vs. underscores consistent
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          force: true
         if: contains(github.ref, 'refs/heads/versions/' )

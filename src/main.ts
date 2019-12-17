@@ -15,6 +15,8 @@ async function areChanges(): Promise<boolean> {
 
 async function run(): Promise<void> {
   const githubToken = core.getInput('github_token')
+  const forcePush = core.getInput('force')
+  console.log('fixme: force', forcePush, typeof forcePush)
   const context = github.context
   if (!context.payload.repository) {
     throw new Error('No repository found in Github payload. Cannot continue.')
