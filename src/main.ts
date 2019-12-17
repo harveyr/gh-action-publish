@@ -1,16 +1,15 @@
 import * as core from '@actions/core'
 import * as kit from '@harveyr/github-actions-kit'
+import * as github from '@actions/github'
 
 const BRANCH_PREFIX = 'refs/heads/versions/'
 
 async function run(): Promise<void> {
-  const contextRaw = core.getInput('github_context')
-  if (contextRaw) {
-    throw new Error('github_context not provided')
-  }
+  const context = github.context
+  // const { ref } = context.ref
+  console.log('context', JSON.stringify(context, null, 2))
 
-  const context = JSON.parse(contextRaw)
-  console.log('FIXME:', context.ref)
+  throw new Error('nope')
 
   const longRepo: string = context.repository
   const [username, repo] = longRepo.split('/')
