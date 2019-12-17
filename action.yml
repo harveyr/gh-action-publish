@@ -6,13 +6,11 @@ inputs:
     description: Current branch (typically, `github.ref`)
     required: true
   github_context:
-    description: FIXME: Experimental
+    description: 'FIXME: Experimental'
   github_token:
     description: Github token (required for pushing)
   github_username:
     description: Github username (required for pushing)
-  github_token:
-    description: Github token (required for pushing)
 runs:
   using: node12
   main: lib/main.js

@@ -8,6 +8,7 @@ async function run(): Promise<void> {
   if (contextRaw) {
     throw new Error('github_context not provided')
   }
+
   const context = JSON.parse(contextRaw)
   console.log('FIXME:', context.ref)
 
