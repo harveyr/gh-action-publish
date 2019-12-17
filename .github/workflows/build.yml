@@ -24,9 +24,7 @@ jobs:
 
       - run: npm test
 
-      - run: |
-          npm i -g @zeit/ncc
-          ncc build src/main.ts -o dist
+      - run: npm run dist
 
       - uses: ./
         with:
