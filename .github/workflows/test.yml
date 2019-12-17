@@ -4,28 +4,28 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+      - uses: actions/checkout@v1
 
-    - run: npm ci
+      - run: npm ci
 
-    - run: npm run build
+      - run: npm run build
 
-    - name: Prettier
-      uses: harveyr/gh-action-prettier@releases/v1
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        patterns: src/**.ts
+      - name: Prettier
+        uses: harveyr/gh-action-prettier@releases/v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          patterns: src/**.ts
 
-    - name: ESLint
-      uses: harveyr/gh-action-eslint@releases/v2
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        patterns: src/**.ts
+      - name: ESLint
+        uses: harveyr/gh-action-eslint@releases/v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          patterns: src/**.ts
 
-    - run: npm test
+      - run: npm test
 
-    - uses: ./
-      with:
-        # TODO: make dashes vs. underscores consistent
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-
+      - uses: ./
+        with:
+          # TODO: make dashes vs. underscores consistent
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+        if: contains(github.ref, 'refs/heads/versions/' )
