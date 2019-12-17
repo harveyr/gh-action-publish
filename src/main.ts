@@ -32,7 +32,7 @@ async function run(): Promise<void> {
   const githubToken = core.getInput('github_token')
   const forcePush = core.getInput('force') === 'true'
   const addPaths: string[] = core
-    .getInput('commit_dirs')
+    .getInput('dirs')
     .split(' ')
     .map(token => {
       return token.trim()

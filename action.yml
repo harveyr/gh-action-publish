@@ -2,7 +2,7 @@ name: Publish
 description: Publish your Github Action to a releases/ branch
 author: Harvey Rogers
 inputs:
-  commit_dirs:
+  dirs:
     description: Space-separated directory paths to force-add and commit
   github_token:
     description: Github token (required for pushing)
