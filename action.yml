@@ -9,6 +9,6 @@ inputs:
   force:
     description: Force push (probably required after the first push)
     default: false
-  runs:
-    using: node12
-    main: dist/main.js
+runs:
+  using: node12
+  main: dist/main.js
