@@ -13,8 +13,6 @@ async function run(): Promise<void> {
 
   const releaseBranch = branch.replace(BRANCH_PREFIX, 'releases/')
 
-  console.log(`Release branch will be: ${releaseBranch}`)
-
   await kit.execAndCapture('git', ['checkout', '-b', releaseBranch])
   await kit.execAndCapture('git', [
     'config',
@@ -31,7 +29,18 @@ async function run(): Promise<void> {
   await kit.execAndCapture('npm', ['ci'])
   await kit.execAndCapture('npm', ['run', 'build'])
   await kit.execAndCapture('git', ['add', '-f', 'lib'])
-  await kit.execAndCapture('git', ['diff-index', '--quiet', 'HEAD'])
+  let changedOutput = await kit.execAndCapture('git', ['status', '-s'])
+  if ((changedOutput.stderr + changedOutput.stdout).length) {
+    await kit.execAndCapture('git', ['commit', '-m', 'Auto commit: build'])
+  }
+
+  await kit.execAndCapture('npm', ['ci', '--only=production'])
+  await kit.execAndCapture('npm', ['run', 'build'])
+  await kit.execAndCapture('git', ['add', '-f', 'lib'])
+  let changedOutput = await kit.execAndCapture('git', ['status', '-s'])
+  if ((changedOutput.stderr + changedOutput.stdout).length) {
+    await kit.execAndCapture('git', ['commit', '-m', 'Auto commit: build'])
+  }
   // git diff-index --quiet HEAD --
 }
 
