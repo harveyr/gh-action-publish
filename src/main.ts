@@ -15,8 +15,7 @@ async function areChanges(): Promise<boolean> {
 
 async function run(): Promise<void> {
   const githubToken = core.getInput('github_token')
-  const forcePush = core.getInput('force')
-  console.log('fixme: force', forcePush, typeof forcePush)
+  const forcePush = core.getInput('force') === 'true'
   const context = github.context
   if (!context.payload.repository) {
     throw new Error('No repository found in Github payload. Cannot continue.')
@@ -71,7 +70,11 @@ async function run(): Promise<void> {
   }
 
   const remote = `https://${actor}:${githubToken}@github.com/${repoOwner}/${repoName}.git`
-  await kit.execAndCapture('git', ['push', remote, `HEAD:${releaseBranch}`])
+  const pushArgs = ['push', remote, `HEAD:${releaseBranch}`]
+  if (forcePush) {
+    pushArgs.push('--force')
+  }
+  await kit.execAndCapture('git', pushArgs)
 }
 
 run().catch(err => {
