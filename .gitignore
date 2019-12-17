@@ -4,6 +4,7 @@
 # we'll force-add the following in release branches:
 lib/
 node_modules/
+dist/
 
 
 __tests__/runner/*
