@@ -9,11 +9,13 @@ async function run(): Promise<void> {
   // const { ref } = context.ref
   console.log('context', JSON.stringify(context, null, 2))
 
-  throw new Error('nope')
+  if (!context.payload.repository) {
+    throw new Error('No repository found in Github payload. Cannot continue.')
+  }
 
-  const longRepo: string = context.repository
-  const [username, repo] = longRepo.split('/')
-  console.log('Parsed repo: %s/%s', username, repo)
+  const repoName = context.payload.repository.name
+  const repoOwner = context.payload.repository.owner.login
+  console.log('Parsed repo: %s/%s', repoName, repoOwner)
 
   const githubUsername = core.getInput('github_username')
   const githubToken = core.getInput('github_token')
