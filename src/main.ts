@@ -77,6 +77,8 @@ async function run(): Promise<void> {
   const releaseBranch = `releases/${version}`
   const currentBranch = ref.replace('refs/heads/', '')
 
+  await kit.execAndCapture('git', ['fetch'])
+
   try {
     await kit.execAndCapture('git', ['checkout', `origin/${releaseBranch}`])
     await kit.execAndCapture('git', ['merge', currentBranch])
