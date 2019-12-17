@@ -4,6 +4,11 @@ import * as kit from '@harveyr/github-actions-kit'
 const BRANCH_PREFIX = 'refs/heads/versions/'
 
 async function run(): Promise<void> {
+  console.log('FIXME:', JSON.parse(core.getInput('github_context')))
+
+  const githubUsername = core.getInput('github_username')
+  const githubToken = core.getInput('github_token')
+
   const branch = core.getInput('branch')
   if (branch.indexOf(BRANCH_PREFIX) !== 0) {
     throw new Error(
@@ -13,7 +18,7 @@ async function run(): Promise<void> {
 
   const releaseBranch = branch.replace(BRANCH_PREFIX, 'releases/')
 
-  await kit.execAndCapture('git', ['checkout', '-b', releaseBranch])
+  // await kit.execAndCapture('git', ['checkout', '-b', releaseBranch])
   await kit.execAndCapture('git', [
     'config',
     '--local',
@@ -44,6 +49,17 @@ async function run(): Promise<void> {
       'Auto commit: node_modules',
     ])
   }
+
+  if (!githubUsername) {
+    console.log('No Github username provided. Not pushing.')
+  }
+  if (!githubToken) {
+    console.log('No Github token provided. Not pushing.')
+  }
+
+  const remote = `https://${githubUsername}:${githubToken}@github.com/${REPOSITORY}.git`
+
+  await kit.execAndCapture('git', ['push', remote, `HEAD:${releaseBranch}`])
 }
 
 run().catch(err => {

@@ -26,4 +26,9 @@ jobs:
 
     - uses: ./
       with:
+        github_context: ${{ toJson(github) }}
         branch: ${{ github.ref }}
+        # TODO: make dashes vs. underscores consistent
+        github_username: harveyr
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+
