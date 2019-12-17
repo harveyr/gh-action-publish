@@ -53,6 +53,7 @@ async function run(): Promise<void> {
   }
 
   // Install and commit the dist node_modules.
+  await kit.execAndCapture('npm', ['cache', 'clean'])
   await kit.execAndCapture('npm', ['ci', '--only=production'])
   await kit.execAndCapture('git', ['add', '-f', 'node_modules'])
   if (await areChanges()) {
