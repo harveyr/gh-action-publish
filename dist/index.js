@@ -35,7 +35,7 @@ module.exports = /******/ (function(modules, runtime) {
   /******/
   /******/ /******/ function startup() {
     /******/ // Load entry module and return exports
-    /******/ return __webpack_require__(907)
+    /******/ return __webpack_require__(982)
     /******/
   } // run startup
   /******/
@@ -7357,6 +7357,108 @@ module.exports = /******/ (function(modules, runtime) {
       /***/
     },
 
+    /***/ 71: /***/ function(__unusedmodule, exports, __webpack_require__) {
+      'use strict'
+
+      Object.defineProperty(exports, '__esModule', { value: true })
+
+      var request = __webpack_require__(277)
+      var universalUserAgent = __webpack_require__(566)
+
+      const VERSION = '4.3.1'
+
+      class GraphqlError extends Error {
+        constructor(request, response) {
+          const message = response.data.errors[0].message
+          super(message)
+          Object.assign(this, response.data)
+          this.name = 'GraphqlError'
+          this.request = request // Maintains proper stack trace (only available on V8)
+
+          /* istanbul ignore next */
+
+          if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, this.constructor)
+          }
+        }
+      }
+
+      const NON_VARIABLE_OPTIONS = [
+        'method',
+        'baseUrl',
+        'url',
+        'headers',
+        'request',
+        'query',
+      ]
+      function graphql(request, query, options) {
+        options =
+          typeof query === 'string'
+            ? (options = Object.assign(
+                {
+                  query,
+                },
+                options,
+              ))
+            : (options = query)
+        const requestOptions = Object.keys(options).reduce((result, key) => {
+          if (NON_VARIABLE_OPTIONS.includes(key)) {
+            result[key] = options[key]
+            return result
+          }
+
+          if (!result.variables) {
+            result.variables = {}
+          }
+
+          result.variables[key] = options[key]
+          return result
+        }, {})
+        return request(requestOptions).then(response => {
+          if (response.data.errors) {
+            throw new GraphqlError(requestOptions, {
+              data: response.data,
+            })
+          }
+
+          return response.data.data
+        })
+      }
+
+      function withDefaults(request$1, newDefaults) {
+        const newRequest = request$1.defaults(newDefaults)
+
+        const newApi = (query, options) => {
+          return graphql(newRequest, query, options)
+        }
+
+        return Object.assign(newApi, {
+          defaults: withDefaults.bind(null, newRequest),
+          endpoint: request.request.endpoint,
+        })
+      }
+
+      const graphql$1 = withDefaults(request.request, {
+        headers: {
+          'user-agent': `octokit-graphql.js/${VERSION} ${universalUserAgent.getUserAgent()}`,
+        },
+        method: 'POST',
+        url: '/graphql',
+      })
+      function withCustomRequest(customRequest) {
+        return withDefaults(customRequest, {
+          method: 'POST',
+          url: '/graphql',
+        })
+      }
+
+      exports.graphql = graphql$1
+      exports.withCustomRequest = withCustomRequest
+      //# sourceMappingURL=index.js.map
+
+      /***/
+    },
+
     /***/ 87: /***/ function(module) {
       module.exports = require('os')
 
@@ -7735,6 +7837,49 @@ module.exports = /******/ (function(modules, runtime) {
 
         return `Unknown system error ${code}`
       }
+
+      /***/
+    },
+
+    /***/ 148: /***/ function(__unusedmodule, exports, __webpack_require__) {
+      'use strict'
+
+      var __importDefault =
+        (this && this.__importDefault) ||
+        function(mod) {
+          return mod && mod.__esModule ? mod : { default: mod }
+        }
+      var __importStar =
+        (this && this.__importStar) ||
+        function(mod) {
+          if (mod && mod.__esModule) return mod
+          var result = {}
+          if (mod != null)
+            for (var k in mod)
+              if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k]
+          result['default'] = mod
+          return result
+        }
+      Object.defineProperty(exports, '__esModule', { value: true })
+      // Originally pulled from https://github.com/JasonEtco/actions-toolkit/blob/master/src/github.ts
+      const graphql_1 = __webpack_require__(71)
+      const rest_1 = __importDefault(__webpack_require__(756))
+      const Context = __importStar(__webpack_require__(390))
+      // We need this in order to extend Octokit
+      rest_1.default.prototype = new rest_1.default()
+      exports.context = new Context.Context()
+      class GitHub extends rest_1.default {
+        constructor(token, opts = {}) {
+          super(
+            Object.assign(Object.assign({}, opts), { auth: `token ${token}` }),
+          )
+          this.graphql = graphql_1.graphql.defaults({
+            headers: { authorization: `token ${token}` },
+          })
+        }
+      }
+      exports.GitHub = GitHub
+      //# sourceMappingURL=github.js.map
 
       /***/
     },
@@ -9908,6 +10053,15 @@ module.exports = /******/ (function(modules, runtime) {
       /***/
     },
 
+    /***/ 300: /***/ function(__unusedmodule, exports) {
+      'use strict'
+
+      Object.defineProperty(exports, '__esModule', { value: true })
+      exports.IN_PREFIX = 'refs/heads/versions/'
+
+      /***/
+    },
+
     /***/ 305: /***/ function(module, __unusedexports, __webpack_require__) {
       'use strict'
 
@@ -11858,6 +12012,67 @@ module.exports = /******/ (function(modules, runtime) {
       /***/
     },
 
+    /***/ 390: /***/ function(__unusedmodule, exports, __webpack_require__) {
+      'use strict'
+
+      Object.defineProperty(exports, '__esModule', { value: true })
+      const fs_1 = __webpack_require__(747)
+      const os_1 = __webpack_require__(87)
+      class Context {
+        /**
+         * Hydrate the context from the environment
+         */
+        constructor() {
+          this.payload = {}
+          if (process.env.GITHUB_EVENT_PATH) {
+            if (fs_1.existsSync(process.env.GITHUB_EVENT_PATH)) {
+              this.payload = JSON.parse(
+                fs_1.readFileSync(process.env.GITHUB_EVENT_PATH, {
+                  encoding: 'utf8',
+                }),
+              )
+            } else {
+              const path = process.env.GITHUB_EVENT_PATH
+              process.stdout.write(
+                `GITHUB_EVENT_PATH ${path} does not exist${os_1.EOL}`,
+              )
+            }
+          }
+          this.eventName = process.env.GITHUB_EVENT_NAME
+          this.sha = process.env.GITHUB_SHA
+          this.ref = process.env.GITHUB_REF
+          this.workflow = process.env.GITHUB_WORKFLOW
+          this.action = process.env.GITHUB_ACTION
+          this.actor = process.env.GITHUB_ACTOR
+        }
+        get issue() {
+          const payload = this.payload
+          return Object.assign(Object.assign({}, this.repo), {
+            number: (payload.issue || payload.pullRequest || payload).number,
+          })
+        }
+        get repo() {
+          if (process.env.GITHUB_REPOSITORY) {
+            const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/')
+            return { owner, repo }
+          }
+          if (this.payload.repository) {
+            return {
+              owner: this.payload.repository.owner.login,
+              repo: this.payload.repository.name,
+            }
+          }
+          throw new Error(
+            "context.repo requires a GITHUB_REPOSITORY environment variable like 'owner/repo'",
+          )
+        }
+      }
+      exports.Context = Context
+      //# sourceMappingURL=context.js.map
+
+      /***/
+    },
+
     /***/ 395: /***/ function(module, __unusedexports, __webpack_require__) {
       module.exports = factory
 
@@ -13165,6 +13380,39 @@ module.exports = /******/ (function(modules, runtime) {
       }
 
       module.exports = get
+
+      /***/
+    },
+
+    /***/ 566: /***/ function(__unusedmodule, exports, __webpack_require__) {
+      'use strict'
+
+      Object.defineProperty(exports, '__esModule', { value: true })
+
+      function _interopDefault(ex) {
+        return ex && typeof ex === 'object' && 'default' in ex
+          ? ex['default']
+          : ex
+      }
+
+      var osName = _interopDefault(__webpack_require__(50))
+
+      function getUserAgent() {
+        try {
+          return `Node.js/${process.version.substr(1)} (${osName()}; ${
+            process.arch
+          })`
+        } catch (error) {
+          if (/wmic os get Caption/.test(error.message)) {
+            return 'Windows <version undetectable>'
+          }
+
+          throw error
+        }
+      }
+
+      exports.getUserAgent = getUserAgent
+      //# sourceMappingURL=index.js.map
 
       /***/
     },
@@ -19813,7 +20061,32 @@ module.exports = /******/ (function(modules, runtime) {
       /***/
     },
 
-    /***/ 907: /***/ function(__unusedmodule, exports, __webpack_require__) {
+    /***/ 954: /***/ function(__unusedmodule, exports, __webpack_require__) {
+      'use strict'
+
+      Object.defineProperty(exports, '__esModule', { value: true })
+      const constants_1 = __webpack_require__(300)
+      function isVersionRef(ref) {
+        return ref.indexOf(constants_1.IN_PREFIX) === 0
+      }
+      exports.isVersionRef = isVersionRef
+
+      /***/
+    },
+
+    /***/ 981: /***/ function(module, __unusedexports, __webpack_require__) {
+      module.exports = getNextPage
+
+      const getPage = __webpack_require__(22)
+
+      function getNextPage(octokit, link, headers) {
+        return getPage(octokit, link, 'next', headers)
+      }
+
+      /***/
+    },
+
+    /***/ 982: /***/ function(__unusedmodule, exports, __webpack_require__) {
       'use strict'
 
       var __awaiter =
@@ -19864,19 +20137,25 @@ module.exports = /******/ (function(modules, runtime) {
         }
       Object.defineProperty(exports, '__esModule', { value: true })
       const core = __importStar(__webpack_require__(827))
+      const github = __importStar(__webpack_require__(148))
       const kit = __importStar(__webpack_require__(557))
-      const BRANCH_PREFIX = 'refs/heads/versions/'
-      function run() {
+      const util = __importStar(__webpack_require__(954))
+      /**
+       * Returns true if git sees changes in the workspace.
+       *
+       * There's probably a more elegant way to do this.
+       */
+      function areChanges() {
         return __awaiter(this, void 0, void 0, function*() {
-          const branch = core.getInput('branch')
-          if (branch.indexOf(BRANCH_PREFIX) !== 0) {
-            throw new Error(
-              `Branch must begin with "${BRANCH_PREFIX}". Got "${branch}".`,
-            )
-          }
-          const releaseBranch = branch.replace(BRANCH_PREFIX, 'releases/')
-          console.log(`Release branch will be: ${releaseBranch}`)
-          yield kit.execAndCapture('git', ['checkout', '-b', releaseBranch])
+          const changedOutput = yield kit.execAndCapture('git', [
+            'status',
+            '-s',
+          ])
+          return (changedOutput.stderr + changedOutput.stdout).length > 0
+        })
+      }
+      function configureGit() {
+        return __awaiter(this, void 0, void 0, function*() {
           yield kit.execAndCapture('git', [
             'config',
             '--local',
@@ -19889,28 +20168,82 @@ module.exports = /******/ (function(modules, runtime) {
             'user.name',
             'Github Action',
           ])
-          yield kit.execAndCapture('npm', ['ci'])
-          yield kit.execAndCapture('npm', ['run', 'build'])
-          yield kit.execAndCapture('git', ['add', '-f', 'lib'])
-          yield kit.execAndCapture('git', ['diff-index', '--quiet', 'HEAD'])
-          // git diff-index --quiet HEAD --
+        })
+      }
+      function run() {
+        return __awaiter(this, void 0, void 0, function*() {
+          const githubToken = core.getInput('github_token')
+          const forcePush = core.getInput('force') === 'true'
+          const addPaths = core
+            .getInput('commit_dirs')
+            .split(' ')
+            .map(token => {
+              return token.trim()
+            })
+            .filter(token => {
+              return Boolean(token)
+            })
+          const context = github.context
+          if (!context.payload.repository) {
+            throw new Error(
+              'No repository found in Github payload. Cannot continue.',
+            )
+          }
+          const repoName = context.payload.repository.name
+          const repoOwner = context.payload.repository.owner.login
+          console.log('Parsed repo: %s/%s', repoName, repoOwner)
+          const { ref, actor } = context
+          if (!util.isVersionRef(ref)) {
+            throw new Error(`Ref is not an expected pattern: "${ref}"`)
+          }
+          yield configureGit()
+          for (const dirPath of addPaths) {
+            yield kit.execAndCapture('git', ['add', '-f', dirPath])
+          }
+          if (yield areChanges()) {
+            yield kit.execAndCapture('git', [
+              'commit',
+              '-m',
+              `Auto commit on behalf of ${actor}`,
+            ])
+          }
+          // Build and commit the source files.
+          // await kit.execAndCapture('npm', ['ci'])
+          // await kit.execAndCapture('npm', ['run', 'build'])
+          // await kit.execAndCapture('git', ['add', '-f', 'lib'])
+          // if (await areChanges()) {
+          //   await kit.execAndCapture('git', ['commit', '-m', `${commitPrefix}: build`])
+          // }
+          // Install and commit the dist node_modules.
+          // await kit.execAndCapture('npm', ['cache', 'verify'])
+          // await kit.execAndCapture('npm', ['ci', '--only=production'])
+          // await kit.execAndCapture('git', ['add', '-f', 'node_modules'])
+          // if (await areChanges()) {
+          //   await kit.execAndCapture('git', [
+          //     'commit',
+          //     '-m',
+          //     `${commitPrefix}: node_modules`,
+          //   ])
+          // }
+          if (!githubToken) {
+            console.log('No Github token provided. Not pushing.')
+          }
+          const remote = `https://${actor}:${githubToken}@github.com/${repoOwner}/${repoName}.git`
+          const version = ref.split('/').pop()
+          const pushArgs = [
+            'push',
+            remote,
+            `HEAD:refs/heads/releases/${version}`,
+          ]
+          if (forcePush) {
+            pushArgs.push('--force')
+          }
+          yield kit.execAndCapture('git', pushArgs)
         })
       }
       run().catch(err => {
         core.setFailed(`${err}`)
       })
-
-      /***/
-    },
-
-    /***/ 981: /***/ function(module, __unusedexports, __webpack_require__) {
-      module.exports = getNextPage
-
-      const getPage = __webpack_require__(22)
-
-      function getNextPage(octokit, link, headers) {
-        return getPage(octokit, link, 'next', headers)
-      }
 
       /***/
     },
