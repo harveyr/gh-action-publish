@@ -72,12 +72,9 @@ async function run(): Promise<void> {
     console.log('No Github token provided. Not pushing.')
   }
 
-  console.log('FIXME:')
-  await kit.execAndCapture('git', ['branch'])
-
-  const remote = `https://${actor}:${githubToken}@github.com/${repoOwner}/${repoName}.git`
+  // const remote = `https://${actor}:${githubToken}@github.com/${repoOwner}/${repoName}.git`
   const version = ref.split('/').pop()
-  const pushArgs = ['push', remote, `HEAD:refs/heads/releases/${version}`]
+  const pushArgs = ['push', 'origin', `HEAD:refs/heads/releases/${version}`]
   if (forcePush) {
     pushArgs.push('--force')
   }
