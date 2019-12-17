@@ -81,7 +81,11 @@ async function run(): Promise<void> {
 
   try {
     await kit.execAndCapture('git', ['checkout', releaseBranch])
-    await kit.execAndCapture('git', ['merge', currentBranch])
+    await kit.execAndCapture('git', [
+      'merge',
+      '--allow-unrelated-histories',
+      currentBranch,
+    ])
     await kit.execAndCapture('git', ['push', 'origin', 'HEAD'])
   } catch (err) {
     console.log('Failed to check out remote branch. Creating new one.')
