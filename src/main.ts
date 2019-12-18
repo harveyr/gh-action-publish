@@ -29,8 +29,6 @@ async function configureGit(): Promise<void> {
 }
 
 async function run(): Promise<void> {
-  const githubToken = core.getInput('github_token')
-  // const forcePush = core.getInput('force') === 'true'
   const addPaths: string[] = core
     .getInput('dirs')
     .split(' ')
@@ -68,11 +66,6 @@ async function run(): Promise<void> {
     ])
   }
 
-  if (!githubToken) {
-    console.log('No Github token provided. Not pushing.')
-  }
-
-  // const remote = `https://${actor}:${githubToken}@github.com/${repoOwner}/${repoName}.git`
   const version = ref.split('/').pop()
   const releaseBranch = `releases/${version}`
   const currentBranch = ref.replace('refs/heads/', '')
@@ -94,12 +87,6 @@ async function run(): Promise<void> {
     await kit.execAndCapture('git', ['checkout', '-b', releaseBranch])
     await kit.execAndCapture('git', ['push', '-u', 'origin', releaseBranch])
   }
-
-  // const pushArgs = ['push', 'origin', `HEAD:refs/heads/releases/${version}`]
-  // if (forcePush) {
-  //   pushArgs.push('--force')
-  // }
-  // await kit.execAndCapture('git', pushArgs)
 }
 
 run().catch(err => {
