@@ -14,7 +14,7 @@ It will fail unless it runs from a `versions/<version>` branch.
 Example step:
 
 ```yaml
-- uses: harveyr/gh-action-publish@releases/<version>
+- uses: harveyr/gh-action-publish@releases/<REPLACE_ME_WITH_VERSION>
   with:
     dirs: dist/
   # Without this if conditional, the step will deliberately error out:
