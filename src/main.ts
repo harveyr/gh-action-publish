@@ -70,23 +70,28 @@ async function run(): Promise<void> {
   const releaseBranch = `releases/${version}`
   const currentBranch = ref.replace('refs/heads/', '')
 
-  await kit.execAndCapture('git', ['fetch'])
+  await kit.execAndCapture('git', [
+    'push',
+    'origin',
+    [currentBranch, releaseBranch].join(':'),
+  ])
+  // await kit.execAndCapture('git', ['fetch'])
 
-  try {
-    await kit.execAndCapture('git', ['checkout', releaseBranch])
-    await kit.execAndCapture('git', [
-      'merge',
-      '--allow-unrelated-histories',
-      '--strategy',
-      'ours',
-      currentBranch,
-    ])
-    await kit.execAndCapture('git', ['push', 'origin', 'HEAD'])
-  } catch (err) {
-    console.log('Failed to check out remote branch. Creating new one.')
-    await kit.execAndCapture('git', ['checkout', '-b', releaseBranch])
-    await kit.execAndCapture('git', ['push', '-u', 'origin', releaseBranch])
-  }
+  // try {
+  //   await kit.execAndCapture('git', ['checkout', releaseBranch])
+  //   await kit.execAndCapture('git', [
+  //     'merge',
+  //     '--allow-unrelated-histories',
+  //     '--strategy',
+  //     'ours',
+  //     currentBranch,
+  //   ])
+  //   await kit.execAndCapture('git', ['push', 'origin', 'HEAD'])
+  // } catch (err) {
+  //   console.log('Failed to check out remote branch. Creating new one.')
+  //   await kit.execAndCapture('git', ['checkout', '-b', releaseBranch])
+  //   await kit.execAndCapture('git', ['push', '-u', 'origin', releaseBranch])
+  // }
 }
 
 run().catch(err => {
