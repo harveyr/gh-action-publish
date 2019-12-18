@@ -84,7 +84,7 @@ async function run(): Promise<void> {
     await kit.execAndCapture('git', [
       'merge',
       '--allow-unrelated-histories',
-      '--strategy-option',
+      '--strategy',
       'ours',
       currentBranch,
     ])
