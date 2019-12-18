@@ -1,10 +1,9 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: Publish
+description: Publish your Github Action to a releases/ branch
+author: Harvey Rogers
 inputs:
-  myInput:              # change this
-    description: 'input description here'
-    default: 'default value if applicable'
+  dirs:
+    description: Space-separated directory paths to force-add and commit
 runs:
-  using: 'node12'
-  main: 'lib/main.js'
+  using: node12
+  main: dist/index.js

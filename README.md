@@ -1,23 +1,22 @@
-A modified version of https://github.com/actions/typescript-action
+# gh-action-publish
 
-# Releases
+This is a Github Action to publish your Github Action!
 
-Tentative SOP, to be improved whenever possible:
+This force-adds and pushes your distribution file(s) to a `releases/<version>`
+branch.
 
-1. Commit all your code changes.
+It will fail unless it runs from a `versions/<version>` branch.
 
-2. Check out a release branch. Keeping releases in these branches limits the
-   amount of node_modules thrash in the repo.
-```bash
-git checkout -b releases/v<NUM>
-# e.g.:
-git checkout -b releases/v3
+**Requires [checkout](https://github.com/actions/checkout) v2 or above.**
+
+## Usage
+
+Example step:
+
+```yaml
+- uses: harveyr/gh-action-publish@releases/<version>
+  with:
+    dirs: dist/
+  # Without this if conditional, the step will deliberately error out:
+  if: contains(github.ref, 'refs/heads/versions/' )
 ```
-
-3. Run the following script to commit your compiled JavaScripts and production
-   node_modules:
-```bash
-./scripts/push_release.sh
-```
-
-4. Maybe: Use Github UI to create a release and tag.
