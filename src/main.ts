@@ -72,6 +72,7 @@ async function run(): Promise<void> {
 
   await kit.execAndCapture('git', [
     'push',
+    '--force',
     'origin',
     [currentBranch, releaseBranch].join(':'),
   ])
